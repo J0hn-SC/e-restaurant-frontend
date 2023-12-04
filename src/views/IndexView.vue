@@ -27,7 +27,7 @@
 
 <script>
 
-import { socket, client_menu } from '@/socket'
+//import { socket, client_menu } from '@/socket'
 import Presentation from '@/components/IndexView/Presentation.vue'
 import ModalReceipt from '@/components/IndexView/ModalReceipt.vue'
 import ItemIndex from '@/components/IndexView/ItemIndex.vue'
@@ -41,7 +41,7 @@ export default {
   },
   data(){
     return {
-      client_menu,
+      client_menu: [],
       //menu_items: [],
       order : {
         time:'',
@@ -71,13 +71,13 @@ export default {
         id_table: this.id_table,
         items: client_menu.items
       };
-      socket.emit("handle-order", order)
+      //socket.emit("handle-order", order)
       setTimeout(() => {
         console.log("3 segundos answer", client_menu.answer_order)
         if(client_menu.answer_order.state > 0){
           if(client_menu.answer_order.state === 1){
             this.answer_message = "Pedido aceptado";
-            socket.emit("get-ready-menu");
+            //socket.emit("get-ready-menu");
             client_menu.count_selected = 0;
           }
           if(client_menu.answer_order.state === 2){
@@ -111,7 +111,7 @@ export default {
 
   },
   mounted(){
-    socket.emit("get-ready-menu");
+    //socket.emit("get-ready-menu");
   }
 }
 </script>
