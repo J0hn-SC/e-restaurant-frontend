@@ -27,7 +27,7 @@
 
 <script>
 
-//import { socket, client_menu } from '@/socket'
+import { socket, client_menu } from '@/socket'
 import Presentation from '@/components/IndexView/Presentation.vue'
 import ModalReceipt from '@/components/IndexView/ModalReceipt.vue'
 import ItemIndex from '@/components/IndexView/ItemIndex.vue'
@@ -111,7 +111,7 @@ export default {
 
   },
   mounted(){
-    //socket.emit("get-ready-menu");
+    socket.emit("get-ready-menu");
   }
 }
 </script>

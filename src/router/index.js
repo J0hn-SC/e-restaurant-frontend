@@ -32,12 +32,13 @@ const routes = [
         name: 'finished_orders',
         component: () => import('../views/FinishedOrdersView.vue')
       },
+      */
       {
         path: 'current_menu',
         name: 'current_menu',
         component: () => import('../views/CurrentMenuView.vue')
       },
-      */
+      
     ]
   }
 ]
