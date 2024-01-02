@@ -40,7 +40,7 @@
 </template>
 
 <script>
-//import { client_menu } from '@/socket'
+import { client_menu } from '@/socket'
 export default {
     name: "ModalReceipt",
     props: {
@@ -51,7 +51,7 @@ export default {
     },
     data(){
         return{
-            client_menu: [],
+            client_menu,
             showModal: false,
             menu_items: [],
             id_table: 0,

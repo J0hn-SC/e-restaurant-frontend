@@ -41,7 +41,7 @@ export default {
   },
   data(){
     return {
-      client_menu: [],
+      client_menu,
       //menu_items: [],
       order : {
         time:'',
@@ -71,7 +71,7 @@ export default {
         id_table: this.id_table,
         items: client_menu.items
       };
-      //socket.emit("handle-order", order)
+      socket.emit("handle-order", order)
       setTimeout(() => {
         console.log("3 segundos answer", client_menu.answer_order)
         if(client_menu.answer_order.state > 0){
