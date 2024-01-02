@@ -41,3 +41,31 @@ socket.on("get-ready-menu", (menu) => {
 socket.on("add-item-to-ready-menu", (item) => {
     client_menu.items[item.id_item] = item;
 });
+
+//dashboard
+socket.on("get-summary", (summary) => {
+    state.summary_orders = summary;
+  });
+  
+socket.on("get-summary-order", (summary_order) => {
+    state.summary_orders.unshift(summary_order);
+  });
+  
+
+//orders
+socket.on("get-all-waiting-order", (orders) => {
+    state.waiting = orders;
+  });
+socket.on("get-waiting-order", (order) => {
+    state.waiting.push(order);
+  });
+
+//recibit mensaje de respuesta
+socket.on("answer-order", (answer_order) => {
+    client_menu.answer_order = answer_order;
+    console.log("estoy en answer order", answer_order)
+    if(answer_order.state === 1){
+      console.log("Entre al if de anser order")
+      socket.emit('get-complete-menu');
+    }
+  });
