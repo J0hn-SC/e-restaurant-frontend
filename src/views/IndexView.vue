@@ -77,7 +77,7 @@ export default {
         if(client_menu.answer_order.state > 0){
           if(client_menu.answer_order.state === 1){
             this.answer_message = "Pedido aceptado";
-            //socket.emit("get-ready-menu");
+            socket.emit("get-ready-menu");
             client_menu.count_selected = 0;
           }
           if(client_menu.answer_order.state === 2){

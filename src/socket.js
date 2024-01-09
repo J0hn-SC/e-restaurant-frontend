@@ -12,6 +12,17 @@ export const client_menu = reactive({
 export const state = reactive({
     menu: {},
     menus: [],
+    //Dashboard
+    summary_orders : [],
+    //Orders
+    waiting: [],
+    preparating: [],
+    //Finished Orders
+    ready : [],
+    commited: [],
+
+
+    frequency : []
 })
 
 const URL =  "http://127.0.0.1:5000/";
