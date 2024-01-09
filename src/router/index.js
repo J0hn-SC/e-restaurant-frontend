@@ -22,7 +22,7 @@ const routes = [
       name: 'dashboard',
       component: () => import('../views/DashboardView.vue')
       },
-      /*
+      
       {
         path: 'orders',
         name: 'orders',
@@ -33,7 +33,7 @@ const routes = [
         name: 'finished_orders',
         component: () => import('../views/FinishedOrdersView.vue')
       },
-      */
+      
       {
         path: 'current_menu',
         name: 'current_menu',
