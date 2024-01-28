@@ -1,34 +1,32 @@
 <template>
     <button id="btn-receipt" class="btn-receipt" @click="openModal()">
         <i class="material-symbols-sharp btn-receipt">receipt_long</i>
-        <p v-if="client_menu.count_selected > 0" class="badge">{{client_menu.count_selected}}</p>
+        <p v-if="basket.length > 0" class="badge">{{basket.length}}</p>
     </button>
     <div class="modal-overlay" :class="{active :showModal}">
-        <div class="modal" ref="scrollableDiv">
-            <h2>Seleccione la cantidad de porciones que desea</h2>
-            <template v-for="(item,key,index) in client_menu.items" :key="index">
-            <div v-if="item.amount > 0" class="item">
-                    <p>{{item.name}}</p>
-                    <p>{{item.description}}</p>
-                    <p>S/. {{item.price}}</p>
-                    <div class="div-icon span-2">
-                        <button class="btn-icon" @click="cancelItem(index)">
-                            <i class="material-symbols-sharp">cancel</i>
-                        </button>
-                    </div>
-                    <p></p>
-                    <div class="amount">
-                        <button id="increase-amount-btn" @click="decreaseAmountItem(item, index)">-</button>
-                        <p>{{item.amount}}</p>
-                        <button id="decrease-amount-btn" @click="increaseAmountItem(item, index)">+</button>
-                    </div>
-                    <p>S/. {{item.amount * item.price}}</p>
+        <div class="modal empty" ref="scrollableDiv" v-if="basket.length === 0">
+            <h2>Su orden esta vacía, por favor seleccione algunos platos o bebidas</h2>
+            <img class="image" src="../../assets/example_add.png" alt="add" width="5rem">
+            <div class="options">
+                <button @click="closeModal()">Retroceder</button>
+                <!-- <button id="order-button" @click="makeOrder()">Ordenar</button>-->
             </div>
-            </template>
-
+        </div>
+        <div class="modal" ref="scrollableDiv" v-else>
+            <h2>Seleccione la cantidad de porciones que desea</h2>
+            <ItemReceipt v-for="(item) in basket" :key="item.id_item" :item="getItem(item.id_item)" :amount="item.amount" />
+            <div class="total-price">
+                <p></p>
+                <p>Suma Total: </p>
+                <p :style="{color: 'red', fontWeight: 'bold'}">S/. {{sumTotal}}</p>
+                <p></p>
+            </div>
             <div class="table">
-                <label>Ingrese el número de mesa</label>
-                <input class="input" type="number" v-model="id_table">
+                <label for="id_table">Ingrese el número de mesa: </label>
+                <div class="div-input">
+                    <input class="input" type="number" min="0" v-model="id_table" name="id_table" @input="validateTable">
+                    <p v-if="(id_table || id_table === 0) && id_table < 1 || id_table > 19" >Ingrese el número de mesa correcto</p>
+                </div>
             </div>
             
             <div class="options">
@@ -40,13 +38,14 @@
 </template>
 
 <script>
-import { client_menu } from '@/socket'
+import { client_menu, socket } from '@/socket'
+import { mapState , mapMutations} from 'vuex'
+import ItemReceipt from './ItemReceipt.vue'
 export default {
+  components: { ItemReceipt },
     name: "ModalReceipt",
     props: {
-        _items : {type: Object, required: true},
-        sendOrder: {type: Function, required: true},
-        cancelItem: {type: Function, required: true},
+        orderBasket: {type: Function, required: true},
         setTable : {type: Function, required: true}
     },
     data(){
@@ -54,42 +53,48 @@ export default {
             client_menu,
             showModal: false,
             menu_items: [],
-            id_table: 0,
-            items: this._items
+            id_table: null,
         }
     },
     computed: {
-        
-        //length(){
-            //return this.computedItems.length;
-        //}
+        ...mapState(['basket']),
+        sumTotal(){
+            return this.basket.reduce((total, basketItem) => {
+            // Busca el objeto correspondiente en items usando el id
+            const item = this.client_menu.items[basketItem.id_item]
+
+            // Multiplica precio por cantidadTotal y suma al total acumulado
+            return total + (item ? item.price * basketItem.amount : 0);
+            }, 0);
+        }
     },
     methods: {
+        ...mapMutations(['add_to_basket', 'remove_from_basket', 'update_amount', 'clean_basket']),
+        isInBasket(id_item){
+            return this.basket.some(item => item.id_item === id_item);
+        },
+        getItem(id_item){
+            return client_menu.items[id_item] || {name: "No encontrado"};
+        },
         openModal(){
             this.showModal = true;
         },
         closeModal(){
             this.showModal = false;
         },
-        increaseAmountItem(item, index){
-            client_menu.items[item.id_item].amount++;
-        },
-        decreaseAmountItem(item, index){
-            if(client_menu.items[item.id_item].amount > 1){
-                client_menu.items[item.id_item].amount--;
+        validateTable(){
+            if(this.id_table > 0){
+
             }
         },
         makeOrder(){
-            this.showModal = false;
-            this.setTable(this.id_table)
-            this.sendOrder();
-            //let orderes_items = []
-            //for(let key in state.client_menu.items){
-            //    if(state.client_menu.items[key].amount > 0){
-            //        orderes_items.push(state.client_menu.items[key]);
-            //    }
-            //}
-            
+            if(this.id_table > 0 && this.id_table < 20){
+                this.showModal = false;
+                this.setTable(this.id_table)
+                this.orderBasket();
+            }else{
+                this.id_table = 0
+            }
         },
         initializeScrollbar(){
             const scrollableDiv = this.$refs.scrollableDiv;
@@ -107,15 +112,30 @@ export default {
     position: sticky;
     top: 5rem;
     left: 80%;
-    width: 4rem;
-    height: 4rem;
-    color: black;
-    background: rgb(0, 255, 213);
+    width: 5rem; /*4rem for phones*/
+    height: 5rem;
+    font-size: 3rem;
+    color: white;
+    background: blue;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 2rem;
-  }
+    border-radius: 50%;
+}
+.badge{
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: red;
+    color: #fff;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -137,6 +157,7 @@ export default {
 .modal {
     width: 45rem;
     height: 30rem;
+    border-radius: 1rem;
     position: absolute;
     top: 25%;
     left: 25%;
@@ -149,6 +170,13 @@ export default {
     color: black;
     overflow-y: auto;
     overflow-x: hidden;
+    
+}
+
+.modal .empty{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .modal .active{
@@ -160,45 +188,21 @@ export default {
   visibility: visible;
 }
 
+.modal .image{
+    width: 15rem;
+    height: 12rem;
+}
+
 .options{
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
 }
 
-
-
-.item{
-    margin-top: 1rem;
-    color: black;
+.modal .total-price{
     display: grid;
-    grid-template-columns: 20% 50% 15% 15%;
-    grid-template-rows: auto;
-    gap: 1rem;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem;
-}
-.span-2{
-    grid-row-end: span 2;
-}
-
-.item .data{
-    
-}
-
-.item .data2{
-    display: flex;
-    justify-content: right;
-    align-items: center;
-    gap: 1rem;
-}
-
-.item .amount{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
+    grid-template-columns: 30% 35% 20% 15%;
+    font-size: 18px;
 }
 
 .table {
@@ -211,6 +215,9 @@ export default {
     border: 1px solid black;
 }
 
+.table p{
+    font-size: 10px;
+}
 
 
 .items{
@@ -220,17 +227,19 @@ export default {
     align-items: flex-start;
     gap: 0.8rem;
 }
-.modal table{
+.modal .table{
   width: 100%;
-  padding: var(--card-padding);
   align-items: center;
-  border-spacing: 0 1rem;
+  margin: 1rem 0;
 }
-
-.modal table:hover{
-  box-shadow: none;
+.modal .table label{
+    font-size: 15px;
 }
-
+.modal .table input[type="number"]{
+    padding: 5px;
+    border-radius: .5rem;
+    border: 1px solid rgb(188, 188, 188);
+}
 .modal button{
   text-align: center;
   margin: 1rem auto;

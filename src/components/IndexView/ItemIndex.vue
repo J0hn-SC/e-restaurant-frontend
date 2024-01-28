@@ -4,13 +4,22 @@
         <div class="details">
             <p>{{item.name}}: {{item.description}}</p>
             <p>S/. {{item.price}}</p>
-            <button class="dish-btn-order" v-if="item.amount < 1" @click="changeAddItem(item, index)">Ordenar</button>
-            <button v-else class="cancel" @click="changeCancelItem(item, index)">Cancelar</button>
+            <button class="dish-btn-order" v-if="!isInBasket(item.id_item)" @click="add_to_basket(item)">Añadir al carrito</button>
+            <div class="dish-btn-ordered" v-else>
+                <button class="circle-btn">
+                    <i v-if="getAmount === 1" class="material-symbols-sharp" @click="remove_from_basket(item.id_item)">delete</i>
+                    <span v-else @click="update_amount({id_item: item.id_item, increment: -1})">-</span>
+                </button>
+                <span>{{getAmount}}</span>
+                <button class="circle-btn" @click="update_amount({id_item: item.id_item, increment: 1})">+</button>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+import { mapMutations, mapState } from 'vuex';
+
 export default {
     name: "ItemIndex",
     props:{
@@ -25,12 +34,26 @@ export default {
         }
     },
     methods:{
+        ...mapMutations(['add_to_basket', 'remove_from_basket', 'update_amount']),
         changeAddItem(item, index){
             this.addItem(item, index);
         },
         changeCancelItem(item, index){
             this.cancelItem(item, index);
+        },
+        isInBasket(id_item){
+            return this.basket.some(item => item.id_item === id_item);
+        },
+        getItemAmount(id_item){
+            const item = this.basket.find(item => item.id_item === id_item);
+            return item? item.amount : 0;
         }
+    },
+    computed:{
+        ...mapState(['basket']),
+        getAmount(){
+            return this.getItemAmount(this.item.id_item)
+        },
     }
 }
 </script>
@@ -68,14 +91,34 @@ export default {
     font-weight: bold;
     padding: 0 0;
 }
-.dish .details button{
+.dish .details .dish-btn-order{
     background: rgb(97, 225, 97);
     color: white;
+    width: 10rem;
 }
-.dish .details button:hover{
+.dish .details .dish-btn-order:hover{
     background: rgb(69, 225, 69);
     color: white;
 }
+
+.dish .details .dish-btn-ordered{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.dish .details .circle-btn{
+    background: rgb(53, 53, 247);
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.8rem;
+}
+.dish .details .circle-btn:hover{
+    background: rgb(107, 107, 246);
+}
+
 
 .dish .details .cancel{
     background: rgb(243, 67, 67);
@@ -118,14 +161,15 @@ export default {
     font-weight: bold;
     padding: 0 0.2rem;
 }
-.dish .details button{
+.dish .details .dish-btn-order{
     background: rgb(97, 225, 97);
     color: white;
 }
-.dish .details button:hover{
+.dish .details .dish-btn-order:hover{
     background: rgb(69, 225, 69);
     color: white;
 }
+
 
 .dish .details .cancel{
     background: rgb(243, 67, 67);

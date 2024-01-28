@@ -9,7 +9,7 @@
         </div>
 
         <ModalReceipt :_items = client_menu.items
-        :sendOrder="this.sendOrder" :cancelItem="this.cancelItem" :setTable="this.setTable"/>
+        :orderBasket="this.orderBasket" :setTable="this.setTable"/>
 
         <div class="menu">
           <ItemIndex v-for="(item, key, index) in client_menu.items" :key="index" 
@@ -20,6 +20,12 @@
         <div class="answer" v-if="show_answer_message">
           <p>{{answer_message}}</p>
         </div>
+        <div class="check-orders" v-if="hasOrders">
+          <p>Puedes revisar el estado de tu ordenes aquí</p>
+          <router-link :to="checklistRoute" class="btn">
+            <p>Revisar mis órdenes</p>
+          </router-link>
+        </div>
       </div>
     </div>
     
@@ -27,10 +33,11 @@
 
 <script>
 
-import { socket, client_menu } from '@/socket'
 import Presentation from '@/components/IndexView/Presentation.vue'
 import ModalReceipt from '@/components/IndexView/ModalReceipt.vue'
 import ItemIndex from '@/components/IndexView/ItemIndex.vue'
+import { socket, client_menu } from '@/socket'
+import { mapState, mapMutations } from 'vuex'
 export default {
   name: 'HomeView',
   components: {
@@ -42,61 +49,54 @@ export default {
   data(){
     return {
       client_menu,
-      //menu_items: [],
-      order : {
-        time:'',
-        id_table: 0,
-        items: []
-      },
       id_table : 0,
       show_answer_message: false,
-      answer_message: ""
+      answer_message: null,
+      hasOrders: false,
     }
   },
   methods:{
-    addItem(item){
-      client_menu.items[item.id_item].amount = 1
-      client_menu.count_selected++;
-    },
-    cancelItem(item){
-      client_menu.items[item.id_item].amount = 0
-      client_menu.count_selected--;
-    },
-    sendOrder(){
-      let today = new Date();
+    ...mapMutations(['clean_basket']),
+    orderBasket(){
+      const today = new Date();
       let time = today.toLocaleTimeString();
-      console.log(this.order);
-      let order = {
-        time,
-        id_table: this.id_table,
-        items: client_menu.items
+      const order = {
+          time,
+          id_table: this.id_table,
+          items: [...this.basket],
+          amount: this.sumTotal
       };
-      socket.emit("handle-order", order)
+      socket.emit("handle-order", order);
+      this.showModal = false;
       setTimeout(() => {
-        console.log("3 segundos answer", client_menu.answer_order)
-        if(client_menu.answer_order.state > 0){
-          if(client_menu.answer_order.state === 1){
-            this.answer_message = "Pedido aceptado";
-            socket.emit("get-ready-menu");
-            client_menu.count_selected = 0;
+          if(client_menu.answer_order.state > 0){
+            if(client_menu.answer_order.state === 1){
+                this.answer_message = "Pedido aceptado";
+                socket.emit("get-ready-menu");
+                this.clean_basket()
+            }
+            if(client_menu.answer_order.state === 2){
+                this.answer_message = "Pedido rechazado";
+            }
+            this.show_answer_message = true;
+            setTimeout(()=>{
+                this.show_answer_message=false;
+                this.hasOrders = true;
+                client_menu.answer_order.state = 0;
+            }, 3000)
           }
-          if(client_menu.answer_order.state === 2){
-            this.answer_message = "Pedido rechazado";
-          }
-          this.show_answer_message = true;
-          setTimeout(()=>{
-            this.show_answer_message=false;
-            client_menu.answer_order.state = 0;
-          }, 3000)
-        }
-      }, 3000);
-    },
-    setTable(id_table){
-      //this.order.id_table = id_table;
-      this.id_table = id_table;
-    }
+      }, 2000);
   },
+  setTable(id_table){
+    //this.order.id_table = id_table;
+    this.id_table = id_table;
+  }
+},
   computed: {
+    ...mapState(['basket']),
+    checklistRoute(){
+      return "checklist/" + this.id_table
+    },
     //
     //items(){
     //  console.log("modificadno item")
@@ -155,14 +155,15 @@ export default {
 
 .answer{
     position: fixed;
-    top: 80%;
-    left: 45%;
+    top: 90%;
+    left: 50%;
+    transform: translateX(-50%);
     width: 25rem;
     height: 3rem;
-    background: rgb(183, 183, 183);
-    color: azure;
-    border-radius: 0rem;
-    border: 1px solid black;
+    background: blue;
+    color: white;
+    border-radius: 1rem;
+    border: none;
     color: black;
     font-size: 1.5rem;
     font-weight: bold;
@@ -170,7 +171,40 @@ export default {
     justify-content: center;
     align-items: center;
   }
+  .answer p{
+    color: white;
+  }
+  .check-orders{
+    position: fixed;
+    top: 90%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 35rem;
+    height: 3.5rem;
+    background: blue;
+    color: rgb(255, 255, 255);
+    border-radius: 1rem;
+    border: none;
+    color: black;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+  .check-orders p{
+    color: white;
+  }
+  .check-orders .btn{
+    background: rgb(97, 225, 97);
+    color: white;
+    border-radius: 1rem;
+    font-size: 16px;
+    padding: 0.5rem 0.8rem;
+  }
+  .check-orders .btn p{
 
+  }
 /*Este e sun ejemplo de como se deben realizar las media queries*/
 /*=====MEDIA QUERIES ===========*/
 @media screen and (max-width: 700px){

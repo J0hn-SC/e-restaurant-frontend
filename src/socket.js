@@ -8,6 +8,9 @@ export const client_menu = reactive({
     count_selected : 0,
   });
 
+export const summary_table = reactive({
+  //id_table: [{order, id_order, items: [{id_item, state}]}]
+});
 
 export const state = reactive({
     menu: {},
@@ -69,6 +72,11 @@ socket.on("get-summary-order", (summary_order) => {
     state.summary_orders.unshift(summary_order);
   });
   
+//checklist
+socket.on("get-summary-table", (summary)=>{
+  console.log(summary)
+  summary_table[summary[0].id_table] = summary
+})
 
 //orders
 socket.on("get-all-waiting-order", (orders) => {
@@ -76,6 +84,12 @@ socket.on("get-all-waiting-order", (orders) => {
   });
 socket.on("get-waiting-order", (order) => {
     state.waiting.push(order);
+    if(summary_table[order.id_table]){
+      summary_table[order.id_table].unshift(order)
+    }else{
+      summary_table[order.id_table] = [order];
+    }
+    console.log("summary_table socket: ",summary_table)
   });
 
 //recibit mensaje de respuesta

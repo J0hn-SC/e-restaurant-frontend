@@ -7,6 +7,11 @@ const routes = [
     component: () => import('../views/IndexView.vue')
   },
   {
+    path: '/checklist/:id',
+    name: 'checklist',
+    component: () => import('../views/ChecklistView.vue')
+  },
+  {
     path: '/about',
     name: 'about',
     component: () => import('../views/AboutView.vue')
