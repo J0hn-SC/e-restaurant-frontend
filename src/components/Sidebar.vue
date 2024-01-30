@@ -14,10 +14,10 @@
         <SidebarLink to="/admin/current_menu" name="Menu Actual" icon="menu_book"/>
         <SidebarLink to="/admin/orders" name="Ordenes" icon="receipt_long"/>
         <SidebarLink to="/admin/finished_orders" name="Ordenes Terminadas" icon="order_approve"/>
-        <SidebarLink to="/admin/menus" name="Menus" icon="menu_book"/>
+        <!-- <SidebarLink to="/admin/menus" name="Menus" icon="menu_book"/>
         <SidebarLink to="/admin/bills" name="Boletas" icon="credit_score"/>
         <SidebarLink to="/admin/payments" name="Pagos" icon="credit_score"/>
-        <SidebarLink to="/admin/logout" name="Cerrar Sesion" icon="logout"/>
+        <SidebarLink to="/admin/logout" name="Cerrar Sesion" icon="logout"/>-->
       </div>
     </div>
 </template>
