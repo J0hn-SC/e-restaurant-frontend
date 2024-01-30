@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import {socket, state} from '@/socket'
+import {socket, state, summary_table} from '@/socket'
 import CompleteOrder from '../components/OrdersView/CompleteOrder.vue'
 export default {
   name:'OrdersView',
@@ -86,12 +86,18 @@ export default {
   },
   methods:{
     order_waiting_to_preparating(index){
-      socket.emit('order-waiting-to-preparating', {id_order: state.waiting[index].id_order})
+      socket.emit('order-waiting-to-preparating', {id_order: state.waiting[index].id_order, id_table: state.waiting[index].id_table})
       state.preparating.push(state.waiting[index]);
+      
+      //console.log("order waiting", state.waiting[index])
+      //console.log("order waiting", summary_table)
+      //console.log("order waiting", summary_table[state.waiting[index].id_table])
+      //console.log("order waiting", summary_table[state.waiting[index].id_table].find((ele) => ele.id_order === state.waiting[index].id_order))
+      //summary_table[state.waiting[index].id_table].find((ele) => ele.id_order == state.waiting[index].id_order).state = 1;
       state.waiting.splice(index, 1);
     },
     order_preparating_to_ready(index){
-      socket.emit('order-preparating-to-ready', {id_order: state.preparating[index].id_order})
+      socket.emit('order-preparating-to-ready', {id_order: state.preparating[index].id_order, id_table: state.preparating[index].id_table})
       state.ready.push(state.preparating[index]);
       state.preparating.splice(index, 1);
       console.log("change function ready",state.ready)

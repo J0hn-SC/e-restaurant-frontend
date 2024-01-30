@@ -1,28 +1,12 @@
 <template>
 <div class="container">
+  <h1>Lista de Mesas</h1>
   <div class="checklist">
-    <h2>Ordenes de la mesa {{$route.params.id}}</h2>
+    <h2>Seleccione la mesa en la que se encuentra para revisar el estado de su orden</h2>
     <div class="list">
-        <table>
-            <thead>
-            <tr>
-                <th>ID orden</th>
-                <th>Mesa</th>
-                <th>Hora orden</th>
-                <th>Estado</th>
-                <th>Pago</th>
-            </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(order,key,index) in summary_table[id_table]" :key="index">
-                    <td>{{order.id_order}}</td>
-                    <td>{{order.id_table}}</td>
-                    <td>{{order.time}}</td>
-                    <td>{{order.state}}</td>
-                    <td>{{order.payment}}</td>
-                </tr>
-            </tbody>
-        </table>
+      <router-link :to="getRouteTable(id_table)" v-for="(id_table, index) in Object.keys(summary_table)" class="table" :key="index">
+        {{id_table}}
+      </router-link>
     </div>
   </div>
 </div>
@@ -44,9 +28,14 @@ export default {
       id_table : parseInt(this.$route.params.id)
     }
   },
+  methods: {
+    getRouteTable(id_table){
+      return "checklist/" + id_table;
+    }
+  },
   mounted(){
     console.log(summary_table)
-    socket.emit("get-summary-table", this.id_table)
+    socket.emit("get-summary-all-table")
     console.log(summary_table)
   }
 }
@@ -63,26 +52,18 @@ export default {
     flex-direction: column;
     gap: 2rem;
 }
-
-.checklist table{
-  background: var(--color-white);
-  border-radius: var(--card-border-radius);
-  width: 100%;
-  padding: var(--card-padding);
-  box-shadow: var(--box-shadow);
-  align-items: center;
-  transition: all 300ms ease;
+.checklist .list{
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+  gap: 1rem;
+}
+.checklist .list .table{
+  background: blue;
+  color: white;
+  font-size: 22px;
+  border-radius: 1rem;
+  padding: 1rem 1rem;
 }
 
-.checklist table tbody td{
-    height: 2.8rem;
-    border-bottom: 1px solid var(--color-light);
-    color: var(--color-dark-variant);
-    text-align: center;
-}
-
-main table tbody tr:last-child td{
-  border: none;
-}
 
 </style>

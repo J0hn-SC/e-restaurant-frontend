@@ -38,7 +38,7 @@
     <!-- END RECENT orders-->
     <div class="right">
       <div class="div-frequency">
-        <h2>Frecuencia de ordenes</h2>
+        <h2>Frecuencia de platos</h2>
         <div class="frequency">
           <template v-for="(item, index) in state.frequency" :key="index">
             <div v-if="item.amount > 0" class="frequency-item">

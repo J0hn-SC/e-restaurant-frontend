@@ -85,11 +85,12 @@ export default {
   },
   methods: {
     order_ready_to_commited(index){
-      socket.emit('order-ready-to-commited', {id_order: state.ready[index].id_order})
+      socket.emit('order-ready-to-commited', {id_order: state.ready[index].id_order, id_table: state.ready[index].id_table})
       state.commited.push(state.ready[index]);
       state.ready.splice(index, 1);
     },
     order_commited_to_finished(index){
+      socket.emit('order-commited-to-finished', {id_order: state.commited[index].id_order, id_table: state.commited[index].id_table})
       //socket.emit('order-commited-to-finished', {id_order: state.commited[index].id_order})
       //state.finished.push(state.commited[index]);
       state.commited.splice(index, 1);

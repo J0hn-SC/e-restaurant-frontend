@@ -22,7 +22,9 @@
         </div>
         <div class="options">
           <button class="slider">Ir a Ordernar</button>
-          <!-- <button class="slider">Ir a reservaciones</button> -->
+          <router-link to="checklist" class="slider">
+            <p>Revisar mis órdenes</p>
+          </router-link>
         </div>
     </div>
 </template>
@@ -115,7 +117,7 @@ text-shadow: rgb(0, 0, 0) -4px 4px 3px;
     margin-top: 3rem;
 }
 
-.presentation .options button{
+.presentation .options .slider{
     background-color: #c2fbd7;
     border-radius: 100px;
     box-shadow: rgba(44, 187, 99, .2) 0 -25px 18px -14px inset,rgba(44, 187, 99, .15) 0 1px 2px,rgba(44, 187, 99, .15) 0 2px 4px,rgba(44, 187, 99, .15) 0 4px 8px,rgba(44, 187, 99, .15) 0 8px 16px,rgba(44, 187, 99, .15) 0 16px 32px;

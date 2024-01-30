@@ -10,10 +10,10 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  --color-primary:#7380ec;
-  --color-danger:#ff7782;
-  --color-success: #41f1b6;
-  --color-warning: #ffbb55;
+  --color-primary:#5969fd;
+  --color-danger:#f01b2d;
+  --color-success: #2af3b0;
+  --color-warning: #feb039;
   --color-white: #fff;
   --color-info-dark: #7d8da1;
   --color-info-light: #dce1eb;
